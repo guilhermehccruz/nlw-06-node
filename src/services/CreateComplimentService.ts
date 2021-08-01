@@ -1,6 +1,6 @@
 import { getCustomRepository } from 'typeorm';
 import { Compliment } from '../entities/Compliments';
-import { ComplimentRepositories } from '../repositories/ComplimentsRepositories';
+import { ComplimentsRepositories } from '../repositories/ComplimentsRepositories';
 import { UsersRepositories } from '../repositories/UsersRepositories';
 
 interface IComplimentRequest {
@@ -17,14 +17,26 @@ class CreateComplimentService {
 		user_receiver,
 		message,
 	}: IComplimentRequest): Promise<Compliment> {
-		const complimentsRepositories = getCustomRepository(ComplimentRepositories);
-		const usersRepository = getCustomRepository(UsersRepositories);
+		const complimentsRepositories = getCustomRepository(
+			ComplimentsRepositories
+		);
+		const usersRepositories = getCustomRepository(UsersRepositories);
 
-		if (user_sender === user_receiver)
-			throw 'User sender and user receiver can not be the same';
+		if (user_sender === user_receiver) throw 'You cannot add a tag to yourself';
 
-		if (await usersRepository.findOne(user_receiver))
+		if (!(await usersRepositories.findOne(user_receiver)))
 			throw 'User receiver not found';
+
+		if (
+			await complimentsRepositories.find({
+				where: {
+					user_sender: user_sender,
+					user_receiver: user_receiver,
+					tag_id: tag_id,
+				},
+			})
+		)
+			throw 'You have already given this tag to that user';
 
 		const compliment = complimentsRepositories.create({
 			tag_id,
