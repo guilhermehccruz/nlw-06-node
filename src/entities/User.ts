@@ -18,8 +18,11 @@ class User {
 	@Column()
 	email: string;
 
-	@Column()
+	@Column({ default: false })
 	admin: boolean;
+
+	@Column()
+	password: string;
 
 	@CreateDateColumn()
 	created_at: Date;

@@ -4,7 +4,7 @@ export function ensureAdmin(
 	request: Request,
 	response: Response,
 	next: NextFunction
-) {
+): void | Response {
 	// Verificar se usuário é admin
 	const admin = true;
 
